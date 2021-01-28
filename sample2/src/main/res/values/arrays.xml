@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="drawableIdList">
+        <item>@drawable/__________01</item>
+        <item>@drawable/__________02</item>
+        <item>@drawable/__________03</item>
+        <item>@drawable/__________04</item>
+        <item>@drawable/__________05</item>
+        <item>@drawable/__________06</item>
+        <item>@drawable/__________07</item>
+        <item>@drawable/__________08</item>
+        <item>@drawable/__________09</item>
+        <item>@drawable/__________10</item>
+        <item>@drawable/__________11</item>
+        <item>@drawable/__________12</item>
+        <item>@drawable/__________13</item>
+        <item>@drawable/__________14</item>
+        <item>@drawable/__________15</item>
+    </array>
+</resources>

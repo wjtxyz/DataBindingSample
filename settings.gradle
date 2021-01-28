@@ -1,0 +1,2 @@
+rootProject.name='DataBindingSample1'
+include ':app', ':sample2', ':sample3', ':sample4'

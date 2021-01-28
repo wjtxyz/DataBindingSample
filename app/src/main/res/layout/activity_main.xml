@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.os.Build" />
+
+        <import type="android.view.View" />
+
+        <import type="android.util.Log" />
+
+        <import type="android.graphics.Color" />
+
+    </data>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableEnd='@{Build.MODEL.equals("mini01B") ? @drawable/toggle_off : @drawable/toggle_on}'
+            android:text='@{Build.MODEL + "/" + Build.DEVICE}'
+            android:visibility='@{Build.MODEL.equals("mini01B") ? View.VISIBLE : View.GONE}' />
+
+        <TextView
+            android:id="@+id/tv2"
+            onEditorActionListener='@{(v, action, event)->Log.d("View", "action=" + action) != 0}'
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@={tv1.text}" />
+
+        <TextView
+            android:id="@+id/tv3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:myText='@{"ABCDEF"}' />
+
+        <EditText
+            android:id="@+id/tv4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ABCDEFHIJKLMNOPQRSTUVWXYZ" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color Text Start" />
+
+        <SeekBar
+            android:id="@+id/sbStart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="@{tv4.text.length()}"
+            android:progress="4" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Color Text End" />
+
+        <SeekBar
+            android:id="@+id/sbEnd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="@{tv4.text.length()}"
+            android:progress="20" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Text Color R" />
+
+        <SeekBar
+            android:id="@+id/sbR"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="255" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Text Color G" />
+
+        <SeekBar
+            android:id="@+id/sbG"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="0" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Text Color B" />
+
+        <SeekBar
+            android:id="@+id/sbB"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="255"
+            android:progress="0" />
+
+        <TextView
+            android:id="@+id/tv5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:colorEnd="@{sbEnd.progress}"
+            app:colorStart="@{sbStart.progress}"
+            app:colorText='@{tv4.text}'
+            app:colorTextColor="@{Color.rgb(sbR.progress, sbG.progress, sbB.progress)}" />
+
+        <TextView
+            android:id="@+id/tv6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</layout>
