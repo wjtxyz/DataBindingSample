@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.xxx.databindingsample3.BR;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,35 +41,7 @@ public class RecyclerViewBindingAdapter {
         List<T> mList;
         int mResourceId;
 
-        final ObservableList.OnListChangedCallback mOnListChangedCallback = new ObservableList.OnListChangedCallback() {
-            @Override
-            public void onChanged(ObservableList sender) {
-                notifyDataSetChanged();
-            }
-
-            @Override
-            public void onItemRangeChanged(ObservableList sender, int positionStart, int itemCount) {
-                notifyItemRangeChanged(positionStart, itemCount);
-            }
-
-            @Override
-            public void onItemRangeInserted(ObservableList sender, int positionStart, int itemCount) {
-                notifyItemRangeInserted(positionStart, itemCount);
-            }
-
-            @Override
-            public void onItemRangeMoved(ObservableList sender, int fromPosition, int toPosition, int itemCount) {
-                for (int i = 0; i < itemCount; i++) {
-                    notifyItemMoved(fromPosition + i, toPosition + i);
-                }
-            }
-
-            @Override
-            public void onItemRangeRemoved(ObservableList sender, int positionStart, int itemCount) {
-                notifyItemRangeRemoved(positionStart, itemCount);
-            }
-        };
-
+        final WeakListChangedListener<T> mWeakOnListChangedCallback = new WeakListChangedListener<>(this);
 
         public RecyclerViewAdapter(Context context, List<T> list, @LayoutRes int itemTemplate) {
             mLayoutInflater = LayoutInflater.from(context);
@@ -76,15 +49,17 @@ public class RecyclerViewBindingAdapter {
         }
 
         public void setParams(List<T> list, int itemTemplate) {
-            if(itemTemplate != mResourceId || list != mList){
+            if (itemTemplate != mResourceId || list != mList) {
                 mResourceId = itemTemplate;
 
                 if (mList instanceof ObservableList) {
-                    ((ObservableList<T>) mList).removeOnListChangedCallback(mOnListChangedCallback);
+                    ((ObservableList<T>) mList).removeOnListChangedCallback(mWeakOnListChangedCallback);
                 }
                 mList = list;
                 if (mList instanceof ObservableList) {
-                    ((ObservableList<T>) mList).addOnListChangedCallback(mOnListChangedCallback);
+                    //ObservableList from ViewModel MUST NOT hold strong reference of RecyclerView.Adapter,
+                    //Otherwise may cause resource leak
+                    ((ObservableList<T>) mList).addOnListChangedCallback(mWeakOnListChangedCallback);
                 }
                 notifyDataSetChanged();
             }
@@ -108,6 +83,69 @@ public class RecyclerViewBindingAdapter {
         @Override
         public int getItemCount() {
             return (mList != null) ? mList.size() : 0;
+        }
+    }
+
+    static class WeakListChangedListener<T> extends ObservableList.OnListChangedCallback<ObservableList<T>> {
+
+        final WeakReference<RecyclerView.Adapter> weakReference;
+
+        public WeakListChangedListener(RecyclerView.Adapter adapter) {
+            weakReference = new WeakReference<>(adapter);
+        }
+
+        static final RecyclerView.Adapter EMPTY = new RecyclerView.Adapter() {
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                return null;
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
+            }
+
+            @Override
+            public int getItemCount() {
+                return 0;
+            }
+        };
+
+        @NonNull
+        RecyclerView.Adapter ensureGetReference(ObservableList<T> sender) {
+            RecyclerView.Adapter adapter = weakReference.get();
+            if (adapter == null) {
+                sender.removeOnListChangedCallback(this);
+            }
+            return adapter != null ? adapter : EMPTY;
+        }
+
+        @Override
+        public void onChanged(ObservableList<T> sender) {
+            ensureGetReference(sender).notifyDataSetChanged();
+        }
+
+        @Override
+        public void onItemRangeChanged(ObservableList<T> sender, int positionStart, int itemCount) {
+            ensureGetReference(sender).notifyItemRangeChanged(positionStart, itemCount);
+        }
+
+        @Override
+        public void onItemRangeInserted(ObservableList<T> sender, int positionStart, int itemCount) {
+            ensureGetReference(sender).notifyItemRangeInserted(positionStart, itemCount);
+        }
+
+        @Override
+        public void onItemRangeMoved(ObservableList<T> sender, int fromPosition, int toPosition, int itemCount) {
+            for (int i = 0; i < itemCount; i++) {
+                ensureGetReference(sender).notifyItemMoved(fromPosition + i, toPosition + i);
+            }
+        }
+
+        @Override
+        public void onItemRangeRemoved(ObservableList<T> sender, int positionStart, int itemCount) {
+            ensureGetReference(sender).notifyItemRangeRemoved(positionStart, itemCount);
         }
     }
 }

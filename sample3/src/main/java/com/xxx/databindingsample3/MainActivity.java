@@ -34,13 +34,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class ViewModel extends AndroidViewModel {
-        public final LiveData<List<ResolveInfo>> resolveInfoLiveData = new LiveData<List<ResolveInfo>>() {
+        public final LiveData<List<ResolveInfo>> resolveInfoLiveData = new LiveData<List<ResolveInfo>>(new ObservableArrayList<>()) {
             @Override
             protected void onActive() {
                 super.onActive();
-                ObservableArrayList<ResolveInfo> packageInfos = new ObservableArrayList<>();
-                packageInfos.addAll(getApplication().getPackageManager().queryIntentActivities(Intent.makeMainActivity(null), 0));
-                setValue(packageInfos);
+                getValue().clear();
+                getValue().addAll(getApplication().getPackageManager().queryIntentActivities(Intent.makeMainActivity(null), 0));
+
                 IntentFilter filter = new IntentFilter();
                 filter.addAction(Intent.ACTION_PACKAGE_ADDED);
                 filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
