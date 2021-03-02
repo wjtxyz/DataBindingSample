@@ -18,6 +18,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.xxx.databindingsample3.databinding.ActivityMainBinding;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class ViewModel extends AndroidViewModel {
-        public final LiveData<ObservableArrayList<ResolveInfo>> resolveInfoLiveData = new LiveData<ObservableArrayList<ResolveInfo>>() {
+        public final LiveData<List<ResolveInfo>> resolveInfoLiveData = new LiveData<List<ResolveInfo>>() {
             @Override
             protected void onActive() {
                 super.onActive();
